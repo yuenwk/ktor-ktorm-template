@@ -15,7 +15,8 @@
  */
 package com.example.core.util
 
-import org.jetbrains.annotations.Contract
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 /**
  * Assertion utility class that assists in validating arguments.
@@ -131,12 +132,12 @@ object Assert {
      * Assert that an object is `null`.
      * <pre class="code">Assert.isNull(value, "The value must be null");</pre>
      *
-     * @param object  the object to check
+     * @param value   the object to check
      * @param message the exception message to use if the assertion fails
      * @throws IllegalArgumentException if the object is not `null`
      */
-    fun isNull(`object`: Any?, message: String) {
-        require(`object` == null) { message }
+    fun isNull(value: Any?, message: String) {
+        require(value == null) { message }
     }
 
     /**
@@ -145,26 +146,30 @@ object Assert {
      * Assert.isNull(value, () -&gt; "The value '" + value + "' must be null");
     </pre> *
      *
-     * @param object          the object to check
+     * @param value           the object to check
      * @param lazyMessage     a supplier for the exception message to use if the
      * assertion fails
      * @throws IllegalArgumentException if the object is not `null`
      * @since 5.0
      */
-    fun isNull(`object`: Any?, lazyMessage: () -> String) {
-        require(`object` == null) { lazyMessage }
+    fun isNull(value: Any?, lazyMessage: () -> String) {
+        require(value == null) { lazyMessage }
     }
 
     /**
      * Assert that an object is not `null`.
      * <pre class="code">Assert.notNull(clazz, "The class must not be null");</pre>
      *
-     * @param object  the object to check
+     * @param value   the object to check
      * @param message the exception message to use if the assertion fails
      * @throws IllegalArgumentException if the object is `null`
      */
-    fun notNull(`object`: Any?, message: String) {
-        requireNotNull(`object`) { message }
+    @OptIn(ExperimentalContracts::class)
+    fun <T : Any> notNull(value: T?, message: String): T {
+        contract {
+            returns() implies (value != null)
+        }
+        return requireNotNull(value) { message }
     }
 
     /**
@@ -174,14 +179,18 @@ object Assert {
      * () -&gt; "ID for entity " + entity.getName() + " must not be null");
     </pre> *
      *
-     * @param object          the object to check
+     * @param value          the object to check
      * @param lazyMessage     a supplier for the exception message to use if the
      * assertion fails
      * @throws IllegalArgumentException if the object is `null`
      * @since 5.0
      */
-    fun notNull(`object`: Any?, lazyMessage: () -> String) {
-        requireNotNull(`object`) { lazyMessage }
+    @OptIn(ExperimentalContracts::class)
+    fun <T : Any> notNull(value: T?, lazyMessage: () -> Any): T {
+        contract {
+            returns() implies (value != null)
+        }
+        return requireNotNull(value) { lazyMessage }
     }
 
     /**
@@ -189,12 +198,19 @@ object Assert {
      * it must not be `null` and not the empty String.
      * <pre class="code">Assert.hasLength(name, "Name must not be empty");</pre>
      *
-     * @param text    the String to check
+     * @param value   the String to check
      * @param message the exception message to use if the assertion fails
      * @throws IllegalArgumentException if the text is empty
      */
-    fun hasLength(text: String?, message: String) {
-        require(!text.isNullOrEmpty()) { message }
+    @OptIn(ExperimentalContracts::class)
+    fun hasLength(value: String?, message: String): String {
+        contract {
+            returns() implies (value != null)
+        }
+        if (value.isNullOrEmpty()) {
+            throw IllegalArgumentException(message)
+        }
+        return value
     }
 
     /**
@@ -205,14 +221,21 @@ object Assert {
      * () -&gt; "Name for account '" + account.getId() + "' must not be empty");
     </pre> *
      *
-     * @param text            the String to check
+     * @param value           the String to check
      * @param lazyMessage     a supplier for the exception message to use if the
      * assertion fails
      * @throws IllegalArgumentException if the text is empty
      * @since 5.0
      */
-    fun hasLength(text: String?, lazyMessage: () -> String) {
-        require(!text.isNullOrEmpty()) { lazyMessage }
+    @OptIn(ExperimentalContracts::class)
+    fun hasLength(value: String?, lazyMessage: () -> String): String {
+        contract {
+            returns() implies (value != null)
+        }
+        if (value.isNullOrEmpty()) {
+            throw IllegalArgumentException(lazyMessage())
+        }
+        return value
     }
 
     /**
@@ -220,12 +243,19 @@ object Assert {
      * be `null` and must contain at least one non-whitespace character.
      * <pre class="code">Assert.hasText(name, "'name' must not be empty");</pre>
      *
-     * @param text    the String to check
+     * @param value   the String to check
      * @param message the exception message to use if the assertion fails
      * @throws IllegalArgumentException if the text does not contain valid text content
      */
-    fun hasText(text: String?, message: String) {
-        require(!text.isNullOrBlank()) { message }
+    @OptIn(ExperimentalContracts::class)
+    fun hasText(value: String?, message: String): String {
+        contract {
+            returns() implies (value != null)
+        }
+        if (value.isNullOrBlank()) {
+            throw IllegalArgumentException(message)
+        }
+        return value
     }
 
     /**
@@ -236,14 +266,21 @@ object Assert {
      * () -&gt; "Name for account '" + account.getId() + "' must not be empty");
     </pre> *
      *
-     * @param text            the String to check
+     * @param value           the String to check
      * @param lazyMessage     a supplier for the exception message to use if the
      * assertion fails
      * @throws IllegalArgumentException if the text does not contain valid text content
      * @since 5.0
      */
-    fun hasText(text: String?, lazyMessage: () -> String) {
-        require(!text.isNullOrBlank()) { lazyMessage }
+    @OptIn(ExperimentalContracts::class)
+    fun hasText(value: String?, lazyMessage: () -> String): String {
+        contract {
+            returns() implies (value != null)
+        }
+        if (value.isNullOrBlank()) {
+            throw IllegalArgumentException(lazyMessage())
+        }
+        return value
     }
 
     /**
@@ -287,8 +324,16 @@ object Assert {
      * @param message the exception message to use if the assertion fails
      * @throws IllegalArgumentException if the object array is `null` or contains no elements
      */
-    fun notEmpty(array: Array<Any?>?, message: String) {
-        require(!array.isNullOrEmpty()) { message }
+
+    @OptIn(ExperimentalContracts::class)
+    fun <T : Any> notEmpty(array: Array<T?>?, message: String): Array<T?> {
+        contract {
+            returns() implies (array != null)
+        }
+        if (array.isNullOrEmpty()) {
+            throw IllegalArgumentException(message)
+        }
+        return array
     }
 
     /**
@@ -304,8 +349,15 @@ object Assert {
      * @throws IllegalArgumentException if the object array is `null` or contains no elements
      * @since 5.0
      */
-    fun notEmpty(array: Array<Any?>?, lazyMessage: () -> String) {
-        require(!array.isNullOrEmpty()) { lazyMessage }
+    @OptIn(ExperimentalContracts::class)
+    fun <T : Any> notEmpty(array: Array<T?>?, lazyMessage: () -> String): Array<T?> {
+        contract {
+            returns() implies (array != null)
+        }
+        if (array.isNullOrEmpty()) {
+            throw IllegalArgumentException(lazyMessage())
+        }
+        return array
     }
 
     /**
@@ -318,12 +370,17 @@ object Assert {
      * @param message the exception message to use if the assertion fails
      * @throws IllegalArgumentException if the object array contains a `null` element
      */
-    fun noNullElements(array: Array<Any?>?, message: String) {
-        if (array != null) {
-            for (element in array) {
-                requireNotNull(element) { message }
-            }
+    @OptIn(ExperimentalContracts::class)
+    fun <T : Any> noNullElements(array: Array<T?>?, message: String): Array<T?> {
+        contract {
+            returns() implies (array != null)
         }
+
+        if (array.isNullOrEmpty() || array.any { it == null }) {
+            throw IllegalArgumentException(message)
+        }
+
+        return array
     }
 
     /**
@@ -340,12 +397,17 @@ object Assert {
      * @throws IllegalArgumentException if the object array contains a `null` element
      * @since 5.0
      */
-    fun noNullElements(array: Array<Any?>?, lazyMessage: () -> String) {
-        if (array != null) {
-            for (element in array) {
-                requireNotNull(element) { lazyMessage }
-            }
+    @OptIn(ExperimentalContracts::class)
+    fun <T : Any> noNullElements(array: Array<T?>?, lazyMessage: () -> String): Array<T?> {
+        contract {
+            returns() implies (array != null)
         }
+
+        if (array.isNullOrEmpty() || array.any { it == null }) {
+            throw IllegalArgumentException(lazyMessage())
+        }
+
+        return array
     }
 
     /**
@@ -358,8 +420,15 @@ object Assert {
      * @throws IllegalArgumentException if the collection is `null` or
      * contains no elements
      */
-    fun notEmpty(collection: Collection<*>?, message: String) {
-        require(!(collection == null || collection.isEmpty())) { message }
+    @OptIn(ExperimentalContracts::class)
+    fun <T> notEmpty(collection: Collection<T>?, message: String): Collection<T> {
+        contract {
+            returns() implies (collection != null)
+        }
+        if (collection.isNullOrEmpty()) {
+            throw IllegalArgumentException(message)
+        }
+        return collection
     }
 
     /**
@@ -376,10 +445,15 @@ object Assert {
      * contains no elements
      * @since 5.0
      */
-    fun notEmpty(collection: Collection<*>?, lazyMessage: () -> String) {
-        require(!(collection == null || collection.isEmpty())) {
-            lazyMessage
+    @OptIn(ExperimentalContracts::class)
+    fun <T> notEmpty(collection: Collection<T?>?, lazyMessage: () -> String): Collection<T?> {
+        contract {
+            returns() implies (collection != null)
         }
+        if (collection.isNullOrEmpty()) {
+            throw IllegalArgumentException(lazyMessage())
+        }
+        return collection
     }
 
     /**
@@ -393,12 +467,15 @@ object Assert {
      * @throws IllegalArgumentException if the collection contains a `null` element
      * @since 5.2
      */
-    fun noNullElements(collection: Collection<*>?, message: String) {
-        if (collection != null) {
-            for (element in collection) {
-                requireNotNull(element) { message }
-            }
+    @OptIn(ExperimentalContracts::class)
+    fun <T> noNullElements(collection: Collection<T?>?, message: String): Collection<T?> {
+        contract {
+            returns() implies (collection != null)
         }
+        if (collection.isNullOrEmpty() || collection.any { it == null }) {
+            throw IllegalArgumentException(message)
+        }
+        return collection
     }
 
     /**
@@ -415,12 +492,15 @@ object Assert {
      * @throws IllegalArgumentException if the collection contains a `null` element
      * @since 5.2
      */
-    fun noNullElements(collection: Collection<*>?, lazyMessage: () -> String) {
-        if (collection != null) {
-            for (element in collection) {
-                requireNotNull(element) { lazyMessage }
-            }
+    @OptIn(ExperimentalContracts::class)
+    fun <T> noNullElements(collection: Collection<T?>?, lazyMessage: () -> String): Collection<T?> {
+        contract {
+            returns() implies (collection != null)
         }
+        if (collection.isNullOrEmpty() || collection.any { it == null }) {
+            throw IllegalArgumentException(lazyMessage())
+        }
+        return collection
     }
 
     /**
@@ -432,8 +512,15 @@ object Assert {
      * @param message the exception message to use if the assertion fails
      * @throws IllegalArgumentException if the map is `null` or contains no entries
      */
-    fun notEmpty(map: Map<*, *>?, message: String) {
-        require(!(map == null || map.isEmpty())) { message }
+    @OptIn(ExperimentalContracts::class)
+    fun <K : Any, V : Any> notEmpty(map: Map<K, V?>?, message: String): Map<K, V?> {
+        contract {
+            returns() implies (map != null)
+        }
+        if (map.isNullOrEmpty()) {
+            throw IllegalArgumentException(message)
+        }
+        return map
     }
 
     /**
@@ -449,152 +536,16 @@ object Assert {
      * @throws IllegalArgumentException if the map is `null` or contains no entries
      * @since 5.0
      */
-    fun notEmpty(map: Map<*, *>?, lazyMessage: () -> String) {
-        require(!(map == null || map.isEmpty())) { lazyMessage }
-    }
-
-    /**
-     * Assert that the provided object is an instance of the provided class.
-     * <pre class="code">Assert.instanceOf(Foo.class, foo, "Foo expected");</pre>
-     *
-     * @param type    the type to check against
-     * @param obj     the object to check
-     * @param message a message which will be prepended to provide further context.
-     * If it is empty or ends in ":" or ";" or "," or ".", a full exception message
-     * will be appended. If it ends in a space, the name of the offending object's
-     * type will be appended. In any other case, a ":" with a space and the name
-     * of the offending object's type will be appended.
-     * @throws IllegalArgumentException if the object is not an instance of type
-     */
-    fun isInstanceOf(type: Class<*>, obj: Any?, message: String) {
-        notNull(type, "Type to check against must not be null")
-        if (!type.isInstance(obj)) {
-            instanceCheckFailed(type, obj, message)
+    @OptIn(ExperimentalContracts::class)
+    fun <K : Any, V : Any> notEmpty(map: Map<K, V?>?, lazyMessage: () -> String): Map<K, V?> {
+        contract {
+            returns() implies (map != null)
         }
-    }
-
-    /**
-     * Assert that the provided object is an instance of the provided class.
-     * <pre class="code">
-     * Assert.instanceOf(Foo.class, foo, () -&gt; "Processing " + Foo.class.getSimpleName() + ":");
-    </pre> *
-     *
-     * @param type            the type to check against
-     * @param obj             the object to check
-     * @param lazyMessage     a supplier for the exception message to use if the
-     * assertion fails. See [.isInstanceOf] for details.
-     * @throws IllegalArgumentException if the object is not an instance of type
-     * @since 5.0
-     */
-    fun isInstanceOf(type: Class<*>, obj: Any?, lazyMessage: () -> String) {
-        notNull(type, "Type to check against must not be null")
-        if (!type.isInstance(obj)) {
-            instanceCheckFailed(type, obj, lazyMessage())
+        if (map.isNullOrEmpty()) {
+            throw IllegalArgumentException(lazyMessage())
         }
-    }
-
-    /**
-     * Assert that the provided object is an instance of the provided class.
-     * <pre class="code">Assert.instanceOf(Foo.class, foo);</pre>
-     *
-     * @param type the type to check against
-     * @param obj  the object to check
-     * @throws IllegalArgumentException if the object is not an instance of type
-     */
-    fun isInstanceOf(type: Class<*>, obj: Any?) {
-        isInstanceOf(type, obj, "")
-    }
-
-    /**
-     * Assert that `superType.isAssignableFrom(subType)` is `true`.
-     * <pre class="code">Assert.isAssignable(Number.class, myClass, "Number expected");</pre>
-     *
-     * @param superType the supertype to check against
-     * @param subType   the subtype to check
-     * @param message   a message which will be prepended to provide further context.
-     * If it is empty or ends in ":" or ";" or "," or ".", a full exception message
-     * will be appended. If it ends in a space, the name of the offending subtype
-     * will be appended. In any other case, a ":" with a space and the name of the
-     * offending subtype will be appended.
-     * @throws IllegalArgumentException if the classes are not assignable
-     */
-    fun isAssignable(superType: Class<*>, subType: Class<*>?, message: String) {
-        notNull(superType, "Supertype to check against must not be null")
-        if (subType == null || !superType.isAssignableFrom(subType)) {
-            assignableCheckFailed(superType, subType, message)
-        }
-    }
-
-    /**
-     * Assert that `superType.isAssignableFrom(subType)` is `true`.
-     * <pre class="code">
-     * Assert.isAssignable(Number.class, myClass, () -&gt; "Processing " + myAttributeName + ":");
-    </pre> *
-     *
-     * @param superType       the supertype to check against
-     * @param subType         the subtype to check
-     * @param lazyMessage     a supplier for the exception message to use if the
-     * assertion fails. See [.isAssignable] for details.
-     * @throws IllegalArgumentException if the classes are not assignable
-     * @since 5.0
-     */
-    fun isAssignable(superType: Class<*>, subType: Class<*>?, lazyMessage: () -> String) {
-        notNull(superType, "Supertype to check against must not be null")
-        if (subType == null || !superType.isAssignableFrom(subType)) {
-            assignableCheckFailed(superType, subType, lazyMessage())
-        }
-    }
-
-    /**
-     * Assert that `superType.isAssignableFrom(subType)` is `true`.
-     * <pre class="code">Assert.isAssignable(Number.class, myClass);</pre>
-     *
-     * @param superType the supertype to check
-     * @param subType   the subtype to check
-     * @throws IllegalArgumentException if the classes are not assignable
-     */
-    fun isAssignable(superType: Class<*>, subType: Class<*>) {
-        isAssignable(superType, subType, "")
-    }
-
-    private fun instanceCheckFailed(type: Class<*>, obj: Any?, msg: String?) {
-        val className = (if (obj != null) obj.javaClass.name else "null")
-        var (result, defaultMessage) = booleanPair(msg, className)
-
-        if (defaultMessage) {
-            result += ("Object of class [$className] must be an instance of $type")
-        }
-        throw IllegalArgumentException(result)
-    }
-
-    private fun assignableCheckFailed(superType: Class<*>, subType: Class<*>?, msg: String?) {
-        var (result, defaultMessage) = booleanPair(msg, subType)
-        if (defaultMessage) {
-            result += (subType.toString() + " is not assignable to " + superType)
-        }
-        throw IllegalArgumentException(result)
-    }
-
-    private fun booleanPair(msg: String?, typeName: Any?): Pair<String, Boolean> {
-        var result = ""
-        var defaultMessage = true
-        if (!msg.isNullOrEmpty()) {
-            if (endsWithSeparator(msg)) {
-                result = "$msg "
-            } else {
-                result = messageWithTypeName(msg, typeName)
-                defaultMessage = false
-            }
-        }
-        return Pair(result, defaultMessage)
-    }
-
-    private fun endsWithSeparator(msg: String): Boolean {
-        return (msg.endsWith(":") || msg.endsWith(";") || msg.endsWith(",") || msg.endsWith("."))
-    }
-
-    private fun messageWithTypeName(msg: String, typeName: Any?): String {
-        return msg + (if (msg.endsWith(" ")) "" else ": ") + typeName
+        return map
     }
 
 }
+

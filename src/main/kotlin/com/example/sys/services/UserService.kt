@@ -1,6 +1,7 @@
 package com.example.sys.services
 
 import com.example.core.plugins.DatabaseFactory.DB
+import com.example.core.util.Assert
 import com.example.sys.models.User
 import com.example.sys.models.Users
 import com.example.sys.models.users
@@ -33,9 +34,7 @@ object UserService {
     }
 
     fun modify(use: User): Int {
-        val user = DB.users.find { it.id eq use.id }
-
-        requireNotNull(user) { "Record does not exist" }
+        val user = Assert.notNull(DB.users.find { it.id eq use.id }) { "Record does not exist" }
 
         user.username = use.username
         user.email = use.email
