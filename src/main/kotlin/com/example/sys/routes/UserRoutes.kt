@@ -1,39 +1,43 @@
-package com.example.routes
+package com.example.sys.routes
 
-import com.example.models.SysUser
-import com.example.services.UserService
+import com.example.sys.models.User
+import com.example.sys.services.UserService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-val service = UserService()
 
 fun Route.userRoute() {
-    route("/sys-user") {
+    route("/user") {
         get {
-            val select = service.list()
+            val select = UserService.list()
             call.respond(select)
         }
+
         get("{id?}") {
             val id = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest)
-            val find = service.getById(id.toInt()) ?: return@get call.respond(HttpStatusCode.NotFound)
+            val find = UserService.getById(id.toInt()) ?: return@get call.respond(HttpStatusCode.NotFound)
             call.respond(find)
         }
+
         post {
-            val userRequest = call.receive<SysUser>()
-            service.save(userRequest)
+            val userRequest = call.receive<User>()
+            UserService.save(userRequest)
             call.respond(userRequest.id)
         }
+
         put {
-            val userRequest = call.receive<SysUser>()
-            val modify = service.modify(userRequest)
+            val userRequest = call.receive<User>()
+            val modify = UserService.modify(userRequest)
             call.respond(modify)
         }
+
         delete("{id?}") {
             val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
-            call.respond(service.delete(id.toInt()))
+            call.respond(UserService.delete(id.toInt()))
         }
+
     }
 }

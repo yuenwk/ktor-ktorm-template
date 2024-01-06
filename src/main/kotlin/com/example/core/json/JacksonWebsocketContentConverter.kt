@@ -16,11 +16,11 @@ import java.io.*
 /**
  * A jackson converter for the [WebSockets] plugin
  */
-class JacksonWebsocketContentConverter(private val objectmapper: ObjectMapper = jacksonObjectMapper()) :
+class JacksonWebsocketContentConverter(private val objectMapper: ObjectMapper = jacksonObjectMapper()) :
     WebsocketContentConverter {
 
     override suspend fun serialize(charset: Charset, typeInfo: TypeInfo, value: Any): Frame {
-        val convertedValue = objectmapper.writeValueAsString(value).toByteArray(charset = charset)
+        val convertedValue = objectMapper.writeValueAsString(value).toByteArray(charset = charset)
         return Frame.Text(true, convertedValue)
     }
 
@@ -31,7 +31,7 @@ class JacksonWebsocketContentConverter(private val objectmapper: ObjectMapper = 
         try {
             return withContext(Dispatchers.IO) {
                 val data = charset.newDecoder().decode(buildPacket { writeFully(content.readBytes()) })
-                objectmapper.readValue(data, objectmapper.constructType(typeInfo.reifiedType))
+                objectMapper.readValue(data, objectMapper.constructType(typeInfo.reifiedType))
             }
         } catch (cause: Exception) {
             val convertException = JsonConvertException("Illegal json parameter found: ${cause.message}", cause)

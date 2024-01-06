@@ -30,8 +30,10 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
     implementation("io.ktor:ktor-serialization-jackson-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
+    implementation("io.ktor:ktor-server-host-common-jvm")
+    implementation("io.ktor:ktor-server-status-pages-jvm")
     testImplementation("io.ktor:ktor-server-tests-jvm")
-    testImplementation("io.ktor:ktor-server-test-host-jvm:2.3.7")
+    testImplementation("io.ktor:ktor-server-test-host-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
 
     implementation("org.ktorm:ktorm-core:${ktorm_version}")
