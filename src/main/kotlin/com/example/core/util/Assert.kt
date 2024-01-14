@@ -1,18 +1,3 @@
-/*
- * Copyright 2002-2023 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.example.core.util
 
 import kotlin.contracts.ExperimentalContracts
@@ -24,43 +9,10 @@ import kotlin.contracts.contract
  *
  * Useful for identifying programmer errors early and clearly at runtime.
  *
- *
- * For example, if the contract of a public method states it does not
- * allow `null` arguments, `Assert` can be used to validate that
- * contract. Doing this clearly indicates a contract violation when it
- * occurs and protects the class's invariants.
- *
- *
- * Typically used to validate method arguments rather than configuration
- * properties, to check for cases that are usually programmer errors rather
- * than configuration errors. In contrast to configuration initialization
- * code, there is usually no point in falling back to defaults in such methods.
- *
- *
- * This class is similar to JUnit's assertion library. If an argument value is
- * deemed invalid, an [IllegalArgumentException] is thrown (typically).
- * For example:
- *
- * <pre class="code">
- * Assert.notNull(clazz, "The class must not be null");
- * Assert.isTrue(i &gt; 0, "The value must be greater than zero");</pre>
- *
- *
- * Mainly for internal use within the framework; for a more comprehensive suite
- * of assertion utilities consider `org.apache.commons.lang3.Validate` from
- * [Apache Commons Lang](https://commons.apache.org/proper/commons-lang/),
- * Google Guava's
- * [Preconditions](https://github.com/google/guava/wiki/PreconditionsExplained),
- * or similar third-party libraries.
- *
- * @author Keith Donald
- * @author Juergen Hoeller
- * @author Sam Brannen
- * @author Colin Sampaleanu
- * @author Rob Harrop
- * @since 1.1.2
+ * Reference comes from [spring](https://github.com/spring-projects/spring-framework/blob/main/spring-core/src/main/java/org/springframework/util/Assert.java)
  */
 object Assert {
+
     /**
      * Assert a boolean expression, throwing an `IllegalStateException`
      * if the expression evaluates to `false`.
@@ -95,7 +47,7 @@ object Assert {
      * @since 5.0
      */
     fun state(expression: Boolean, lazyMessage: () -> String) {
-        check(expression) { lazyMessage }
+        check(expression) { lazyMessage() }
     }
 
     /**
@@ -125,7 +77,7 @@ object Assert {
      * @since 5.0
      */
     fun isTrue(expression: Boolean, lazyMessage: () -> String) {
-        require(expression) { lazyMessage }
+        require(expression) { lazyMessage() }
     }
 
     /**
@@ -147,13 +99,12 @@ object Assert {
     </pre> *
      *
      * @param value           the object to check
-     * @param lazyMessage     a supplier for the exception message to use if the
-     * assertion fails
+     * @param lazyMessage     a supplier for the exception message to use if the assertion fails
      * @throws IllegalArgumentException if the object is not `null`
      * @since 5.0
      */
     fun isNull(value: Any?, lazyMessage: () -> String) {
-        require(value == null) { lazyMessage }
+        require(value == null) { lazyMessage() }
     }
 
     /**
@@ -190,7 +141,7 @@ object Assert {
         contract {
             returns() implies (value != null)
         }
-        return requireNotNull(value) { lazyMessage }
+        return requireNotNull(value) { lazyMessage() }
     }
 
     /**
