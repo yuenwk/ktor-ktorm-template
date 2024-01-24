@@ -1,9 +1,13 @@
 package com.example.core.exception
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include
+
 
 data class ExceptionResponse(
 
-    val code: Int = 0,
+    @JsonInclude(Include.NON_NULL)
+    val code: Int?,
 
     val message: String
 

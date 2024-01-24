@@ -1,7 +1,9 @@
 package com.example
 
-import com.example.core.plugins.DatabaseFactory
+import com.example.core.initDB
 import com.example.core.plugins.configureExceptions
+import com.example.core.plugins.configureMonitor
+import com.example.core.plugins.configureSecurity
 import com.example.core.plugins.configureSerialization
 import com.example.sys.configureSysRouting
 import io.ktor.server.application.*
@@ -15,8 +17,15 @@ fun main(args: Array<String>) {
 fun Application.module() {
     configureSerialization()
     configureExceptions()
+    configureMonitor()
+    configureSecurity()
 
     configureSysRouting()
 
-    DatabaseFactory.DB
+    val config = environment.config
+
+    Database.DB = initDB(
+        config.propertyOrNull("storage.driverClassName")?.getString() ?: error("Required value was null."),
+        config.propertyOrNull("storage.jdbcURL")?.getString() ?: error("Required value was null.")
+    )
 }

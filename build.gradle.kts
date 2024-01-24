@@ -32,6 +32,10 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("io.ktor:ktor-server-host-common-jvm")
     implementation("io.ktor:ktor-server-status-pages-jvm")
+    implementation("io.ktor:ktor-server-sessions-jvm")
+    implementation("io.ktor:ktor-server-auth-jvm")
+    implementation("io.ktor:ktor-server-call-logging-jvm")
+
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("io.ktor:ktor-server-test-host-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
@@ -40,7 +44,7 @@ dependencies {
     implementation("org.ktorm:ktorm-support-postgresql:${ktorm_version}")
     implementation("org.ktorm:ktorm-jackson:${ktorm_version}")
 
-    implementation("org.postgresql:postgresql:${postgresql_version}")
+    runtimeOnly("org.postgresql:postgresql:${postgresql_version}")
     implementation("com.zaxxer:HikariCP:${hikaricp_version}")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")

@@ -12,7 +12,7 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-package com.example.core.bcrypt;
+package com.example.security.bcrypt;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

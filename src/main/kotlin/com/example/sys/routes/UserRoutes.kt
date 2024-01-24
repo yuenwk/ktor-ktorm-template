@@ -1,5 +1,6 @@
 package com.example.sys.routes
 
+import com.example.core.auth.withRoles
 import com.example.sys.models.User
 import com.example.sys.services.UserService
 import io.ktor.http.*
@@ -11,9 +12,14 @@ import io.ktor.server.routing.*
 
 fun Route.userRoute() {
     route("/user") {
-        get {
-            val select = UserService.list()
-            call.respond(select)
+
+
+        withRoles("1") {
+            get {
+
+                val select = UserService.list()
+                call.respond(select)
+            }
         }
 
         get("{id?}") {

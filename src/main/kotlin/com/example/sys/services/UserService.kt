@@ -1,7 +1,7 @@
 package com.example.sys.services
 
-import com.example.core.plugins.DatabaseFactory.DB
-import com.example.core.util.Assert
+import com.example.Database.DB
+import com.example.security.bcrypt.BCryptPasswordEncoder
 import com.example.sys.models.User
 import com.example.sys.models.Users
 import com.example.sys.models.users
@@ -15,8 +15,7 @@ import org.ktorm.entity.removeIf
 import java.time.LocalDateTime
 
 object UserService {
-
-//    private var bCryptPassword = BCryptPasswordEncoder()
+    var bCryptPassword = BCryptPasswordEncoder()
 
     fun list(): List<User> {
         return DB.from(Users)
@@ -28,18 +27,28 @@ object UserService {
         return DB.users.find { it.id eq id }
     }
 
+    fun login(username: String, password: String): User? {
+        val user = DB.users.find { it.username eq username }?.let {
+            if (bCryptPassword.matches(password, it.password)) return it
+            null
+        }
+
+        return user
+    }
+
     fun save(use: User): Int {
         use.createdAt = LocalDateTime.now()
+        use.password = bCryptPassword.encode(use.password)
         return DB.users.add(use)
     }
 
     fun modify(use: User): Int {
-        val user = Assert.notNull(DB.users.find { it.id eq use.id }) { "Record does not exist" }
+        val user = requireNotNull(DB.users.find { it.id eq use.id }) { "Record does not exist" }
 
         user.username = use.username
         user.email = use.email
         user.lastLogin = use.lastLogin
-//        user.password = bCryptPassword.encode(use.password)
+        user.password = bCryptPassword.encode(use.password)
         return user.flushChanges()
     }
 

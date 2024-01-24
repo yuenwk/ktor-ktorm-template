@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.core.bcrypt;
+package com.example.security.bcrypt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

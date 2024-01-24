@@ -20,7 +20,9 @@ object ExceptionHandler {
                 // Some business logic error, status 412 Precondition Failed is appropriate here
                 call.respond(
                     HttpStatusCode.PreconditionFailed,
-                    ExceptionResponse(cause.code, cause.message ?: cause.toString())
+                    mapOf(
+                        "error" to ExceptionResponse(cause.code, cause.message ?: cause.toString())
+                    )
                 )
             }
 
@@ -28,21 +30,28 @@ object ExceptionHandler {
             is IllegalStateException -> {
                 call.respond(
                     HttpStatusCode.BadRequest,
-                    ExceptionResponse(HttpStatusCode.BadRequest.value, cause.message ?: cause.toString())
+                    mapOf(
+                        "error" to ExceptionResponse(
+                            HttpStatusCode.BadRequest.value,
+                            cause.message ?: cause.toString()
+                        )
+                    )
                 )
             }
-
             // We can have other categories
             else -> {
                 // All the other Exceptions become status 500, with more info in development mode.
                 //                cause.stackTrace.forEach { println(it) }
                 call.respond(
                     HttpStatusCode.InternalServerError,
-                    ExceptionResponse(
-                        HttpStatusCode.InternalServerError.value,
-                        if (developmentMode) (cause.message ?: cause.toString()) else "Internal Error"
+                    mapOf(
+                        "error" to ExceptionResponse(
+                            HttpStatusCode.InternalServerError.value,
+                            if (developmentMode) (cause.message ?: cause.toString()) else "Internal Error"
+                        )
                     )
                 )
+
             }
         }
     }
